@@ -1,0 +1,55 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MoveBackground : MonoBehaviour
+{
+    [SerializeField] private Transform player;
+
+    [SerializeField] private Chunk[] BackPrefabs;
+    [SerializeField] private Chunk firstBack;
+
+    private readonly List<Chunk> spawnChunks = new List<Chunk>();
+
+    private void Start()
+    {
+
+        spawnChunks.Add(firstBack);
+
+        StartCoroutine(SpawnLag());
+    }
+
+    IEnumerator SpawnLag()
+    {
+        this.SpawnChunk();
+
+        yield return new WaitForSeconds((float)3);
+        Debug.Log("lag");
+    }
+
+    private void Update()
+    {
+        if (player.position.x > spawnChunks[spawnChunks.Count - 1].End.position.x - 500)
+        {
+            SpawnChunk();
+        }
+    }
+
+    private void SpawnChunk()
+    {
+        Chunk newChunk = Instantiate(BackPrefabs[Random.Range(0, BackPrefabs.Length)]);
+
+        newChunk.transform.position = spawnChunks[spawnChunks.Count - 1].End.position - newChunk.Begin.localPosition;
+        spawnChunks.Add(newChunk);
+
+        Debug.Log("spawnChunk");
+
+        if (spawnChunks.Count >= 7)
+        {
+            Destroy(spawnChunks[0].gameObject);
+
+            spawnChunks.RemoveAt(0);
+        }
+
+    }
+}
